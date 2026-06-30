@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last-Minute Life Saver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Full Screen Login Page -->
+    <div id="login-screen" class="login-screen glass-panel">
+        <div class="login-content">
+            <i class="fa-solid fa-bolt-lightning text-accent" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>Welcome to Life Saver</h2>
+            <p>Your AI-powered productivity companion.</p>
+            <button id="main-login-btn" class="btn primary-btn" style="margin-top: 2rem; width: 100%;"><i class="fa-brands fa-google"></i> Sign In with Google</button>
+        </div>
+    </div>
+
+    <div class="app-container hidden" id="main-dashboard">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="logo">
+                <i class="fa-solid fa-bolt-lightning text-accent"></i>
+                <h2>Life Saver</h2>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active"><i class="fa-solid fa-border-all"></i> Dashboard</li>
+                <li><i class="fa-solid fa-calendar-day"></i> Calendar</li>
+                <li><i class="fa-solid fa-list-check"></i> Projects</li>
+                <li><i class="fa-solid fa-chart-pie"></i> Insights</li>
+                <li><i class="fa-solid fa-link"></i> Connect Platforms</li>
+            </ul>
+
+            <div class="user-profile">
+                <!-- Will be populated by Firebase Auth -->
+                <button id="login-btn" class="btn primary-btn"><i class="fa-brands fa-google"></i> Sign In</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Right Controls (Theme + Profile) -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding-bottom: 0.5rem; position: relative;">
+                <!-- Global Theme Selector -->
+                <div class="theme-selector">
+                    <select id="theme-select" style="padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); border: 1px solid var(--panel-border); outline: none; cursor: pointer; backdrop-filter: blur(10px);">
+                        <option value="default" style="color: black; background: white;">Default (Dark)</option>
+                        <option value="white" style="color: black; background: white;">White</option>
+                        <option value="green" style="color: black; background: white;">Green</option>
+                        <option value="brown" style="color: black; background: white;">Brown</option>
+                        <option value="blue" style="color: black; background: white;">Blue</option>
+                    </select>
+                </div>
+
+                <!-- Profile Dropdown Container -->
+                <div id="profile-menu-container" class="hidden" style="position: relative;">
+                    <button id="profile-menu-btn" class="glass-panel" style="display: flex; align-items: center; gap: 10px; border-radius: 20px; padding: 5px 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);">
+                        <div id="profile-avatar" style="width: 28px; height: 28px; background: var(--accent-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px;">U</div>
+                        <i class="fa-solid fa-bars" style="color: var(--text-primary);"></i>
+                    </button>
+                    
+                    <div id="profile-dropdown-menu" class="glass-panel hidden" style="position: absolute; top: 120%; right: 0; min-width: 180px; display: flex; flex-direction: column; padding: 0.5rem 0; z-index: 1000; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                        <a href="#" class="dropdown-item" id="nav-dashboard-dropdown" style="padding: 10px 20px; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-chart-line" style="width: 20px;"></i> Dashboard</a>
+                        <a href="#" class="dropdown-item" id="nav-profile-dropdown" style="padding: 10px 20px; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-user" style="width: 20px;"></i> Profile</a>
+                        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                        <a href="#" class="dropdown-item text-danger" id="dropdown-logout-btn" style="padding: 10px 20px; color: var(--danger); text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-arrow-right-from-bracket" style="width: 20px;"></i> Log Out</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content active">
+                <header class="top-bar">
+                <div class="greeting">
+                    <h1 id="user-greeting">Warm Greetings!</h1>
+                    <p>Let's conquer your deadlines today.</p>
+                </div>
+                
+                <div class="smart-input-container glass-panel">
+                    <i class="fa-solid fa-wand-magic-sparkles text-accent"></i>
+                    <input type="text" id="smart-task-input" placeholder="Tell AI: 'I have a math assignment due Friday...'">
+                    <button id="ai-submit-btn" class="icon-btn"><i class="fa-solid fa-arrow-up"></i></button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- AI Recommendations Section -->
+                <section class="ai-recommendations glass-panel span-2">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-brain"></i> AI Priority Suggestions</h3>
+                        <span class="badge warning">High Urgency</span>
+                    </div>
+                    <div class="recommendation-card active-task">
+                        <div class="task-info">
+                            <h4>Finish UI Mockups</h4>
+                            <p>Due in 3 hours • Estimated effort: 2 hrs</p>
+                        </div>
+                        <button class="btn secondary-btn">Start Now</button>
+                    </div>
+                </section>
+
+                <!-- Upcoming Deadlines -->
+                <section class="upcoming-deadlines glass-panel" id="deadlines-section">
+                    <div class="section-header">
+                        <h3><i class="fa-regular fa-clock"></i> Upcoming Deadlines</h3>
+                    </div>
+                    <ul class="deadline-list" id="deadline-list">
+                        <!-- Populated by JS -->
+                        <li class="deadline-item critical">
+                            <span class="time">Today, 5 PM</span>
+                            <span class="name">Math Assignment</span>
+                        </li>
+                        <li class="deadline-item">
+                            <span class="time">Tomorrow, 10 AM</span>
+                            <span class="name">Team Sync</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Important Emails (Gmail Sync) -->
+                <section class="upcoming-deadlines glass-panel span-3 hidden" id="gmail-section">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-envelope text-accent"></i> Recent Unread Emails</h3>
+                    </div>
+                    <ul class="deadline-list" id="email-list" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Populated by JS -->
+                    </ul>
+                </section>
+
+                <!-- AI Decomposition UI (Hidden by default, shown when breaking down task) -->
+                <section class="task-breakdown glass-panel span-3 hidden" id="ai-breakdown-section">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-layer-group"></i> AI Task Breakdown</h3>
+                        <button class="icon-btn" id="close-breakdown-btn"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="breakdown-content">
+                        <p class="context-text">Breaking down: <strong>"Prepare for Google Interview"</strong></p>
+                        <div class="sub-tasks">
+                            <label class="custom-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Review Graph Algorithms (Est. 1h)
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Practice 2 Leetcode Hard problems (Est. 1.5h)
+                            </label>
+                            <label class="custom-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Prepare STAR method stories (Est. 45m)
+                            </label>
+                        </div>
+                        <button class="btn primary-btn mt-1">Schedule in Calendar</button>
+                    </div>
+                </section>
+            </div>
+            </div>
+
+            <!-- Insights & Chat Page -->
+            <div id="insights-page" class="page-content hidden">
+                <header class="top-bar">
+                    <div class="greeting">
+                        <h1>Insights & AI Chat</h1>
+                        <p>Chat with your AI assistant.</p>
+                    </div>
+                </header>
+                <div class="chat-container glass-panel">
+                    <div class="chat-history" id="chat-history">
+                        <!-- Chat messages go here -->
+                        <div class="chat-message ai-message">
+                            <i class="fa-solid fa-robot text-accent"></i>
+                            <p>Hello! Ask me to help with a task or summarize a topic.</p>
+                        </div>
+                    </div>
+                    
+                    <button id="stop-tts-btn" class="btn secondary-btn hidden" style="position: absolute; top: 1rem; right: 1rem; z-index: 10; background: var(--danger); border-color: var(--danger); color: white;"><i class="fa-solid fa-volume-xmark"></i> Stop Speaking</button>
+                    
+                    <div class="chat-input-area" style="display: flex; gap: 10px; align-items: center; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <!-- Text Input -->
+                        <input type="text" id="chat-input" placeholder="Type your message..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white;">
+                        
+                        <!-- Voice Input -->
+                        <button id="voice-input-btn" class="icon-btn"><i class="fa-solid fa-microphone"></i></button>
+                        
+                        <!-- Submit -->
+                        <button id="chat-submit-btn" class="btn primary-btn" style="padding: 10px 15px;"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div id="calendar-page" class="page-content hidden">
+                <header class="top-bar">
+                    <div class="greeting">
+                        <h1>Calendar</h1>
+                        <p>Manage your schedule and sync with Google Calendar.</p>
+                    </div>
+                    <button class="btn primary-btn" id="sync-gcal-btn"><i class="fa-brands fa-google"></i> Sync Google Calendar</button>
+                </header>
+                <div class="calendar-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    
+                    <!-- Manual Add Section -->
+                    <div class="manual-add-section glass-panel" style="padding: 1.5rem; height: fit-content;">
+                        <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-plus"></i> Add Manual Task</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" id="manual-task-name" placeholder="Task Name..." style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%;" autocomplete="off">
+                            
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Due Date (Optional)</label>
+                                <input type="date" id="manual-task-date" style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;">
+                            </div>
+
+                            <button id="add-manual-task-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-plus"></i> Add Task</button>
+                        </div>
+                    </div>
+
+                    <!-- Task List Section -->
+                    <div class="task-list-section glass-panel" style="padding: 1.5rem; min-height: 400px;">
+                        <h3 style="margin-bottom: 1rem;"><i class="fa-regular fa-calendar-check"></i> Your Schedule</h3>
+                        <ul id="manual-task-list" class="deadline-list" style="padding: 0; display: flex; flex-direction: column; gap: 10px;">
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;" id="no-tasks-msg">No tasks scheduled yet. Add one!</p>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Page -->
+            <div id="projects-page" class="page-content hidden">
+                <header class="top-bar">
+                    <div class="greeting">
+                        <h1>Projects</h1>
+                        <p>Track your assignments and large tasks.</p>
+                    </div>
+                </header>
+                
+                <div class="projects-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <!-- Add Project Form -->
+                    <div class="add-project-section glass-panel" style="padding: 1.5rem; height: fit-content;">
+                        <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-folder-plus"></i> New Project</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" id="project-name-input" placeholder="Project Name..." style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%;" autocomplete="off">
+                            
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Priority</label>
+                                <select id="project-priority-input" style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;">
+                                    <option value="most-important" style="color: black;">Most Important</option>
+                                    <option value="important" style="color: black;">Important</option>
+                                    <option value="less-important" style="color: black;">Less Important</option>
+                                </select>
+                            </div>
+
+                            <button id="add-project-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-plus"></i> Add Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Projects List -->
+                    <div class="projects-list-section glass-panel" style="padding: 1.5rem; min-height: 400px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3><i class="fa-solid fa-list-check"></i> Your Projects</h3>
+                            <select id="project-filter" style="padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white;">
+                                <option value="all" style="color: black;">All Priorities</option>
+                                <option value="most-important" style="color: black;">Most Important</option>
+                                <option value="important" style="color: black;">Important</option>
+                                <option value="less-important" style="color: black;">Less Important</option>
+                            </select>
+                        </div>
+                        
+                        <div id="projects-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;" id="no-projects-msg">No projects added yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connect Platforms Page -->
+            <div id="platforms-page" class="page-content hidden">
+                <header class="top-bar">
+                    <div class="greeting">
+                        <h1>Connect Platforms</h1>
+                        <p>Integrate your favorite tools into one unified hub.</p>
+                    </div>
+                </header>
+                
+                <div class="platforms-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    
+                    <!-- Google Calendar -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-brands fa-google text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Google Calendar</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Sync your daily schedule and events.</p>
+                        <button id="connect-gcal-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-link"></i> Connect</button>
+                    </div>
+
+                    <!-- Google Classroom -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-solid fa-chalkboard-user text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Google Classroom</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Track assignments and announcements.</p>
+                        <button id="connect-classroom-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-link"></i> Connect</button>
+                    </div>
+
+                    <!-- Gmail -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-solid fa-envelope text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Gmail</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">View important unread emails.</p>
+                        <button id="connect-gmail-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-link"></i> Connect</button>
+                    </div>
+                    
+                    <!-- Google Docs/Drive -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-brands fa-google-drive text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Google Drive</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Access recent files and Docs.</p>
+                        <button id="connect-drive-btn" class="btn primary-btn" style="width: 100%;"><i class="fa-solid fa-link"></i> Connect</button>
+                    </div>
+
+                    <!-- GitHub -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-brands fa-github text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">GitHub</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Track pull requests and commits.</p>
+                        <button class="btn secondary-btn" style="width: 100%;"><i class="fa-solid fa-clock"></i> Coming Soon</button>
+                    </div>
+
+                    <!-- Notion -->
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <i class="fa-solid fa-book-open text-accent" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Notion</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Sync your study notes and wikis.</p>
+                        <button class="btn secondary-btn" style="width: 100%;"><i class="fa-solid fa-clock"></i> Coming Soon</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page-content hidden">
+                <header class="top-bar">
+                    <div class="greeting">
+                        <h1>User Profile</h1>
+                        <p>Manage your personal information.</p>
+                    </div>
+                </header>
+                
+                <div class="profile-container glass-panel" style="max-width: 600px; margin: 2rem auto; padding: 2rem;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <label style="font-size: 0.9rem; color: var(--text-secondary);">Full Name</label>
+                            <input type="text" id="profile-name" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;" placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9rem; color: var(--text-secondary);">Age</label>
+                            <input type="number" id="profile-age" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;" placeholder="e.g. 20">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9rem; color: var(--text-secondary);">Gender</label>
+                            <select id="profile-gender" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;">
+                                <option value="" style="color: black;">Select Gender</option>
+                                <option value="Male" style="color: black;">Male</option>
+                                <option value="Female" style="color: black;">Female</option>
+                                <option value="Other" style="color: black;">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9rem; color: var(--text-secondary);">Date of Birth</label>
+                            <input type="date" id="profile-dob" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; width: 100%; margin-top: 5px;">
+                        </div>
+                        <button id="save-profile-btn" class="btn primary-btn" style="width: 100%; margin-top: 1rem;"><i class="fa-solid fa-save"></i> Save Profile</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <!-- Firebase SDKs (v9 modular) will be added in app.js using imports -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
