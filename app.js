@@ -336,8 +336,8 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // AI API Configurations
-const GEMINI_API_KEY = "AQ.Ab8RN6KPzCbkO46IO_sfFv_PhPLWT6trUtwrbcwz7s3sUFOoig"; // From your screenshot
-const GROQ_API_KEY = "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"; // Fallback (Get free key from console.groq.com)
+const GEMINI_API_KEY = "your_gemini_api_key_here"; // From your screenshot
+const GROQ_API_KEY = "your_grok_Api_key"; // Fallback (Get free key from console.groq.com)
 
 // --- AI Interaction Logic ---
 
