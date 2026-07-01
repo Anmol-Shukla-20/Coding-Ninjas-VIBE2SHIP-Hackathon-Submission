@@ -335,10 +335,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// AI API Configurations
-const GEMINI_API_KEY = "your_gemini_api_key_here"; // From your screenshot
-const GROQ_API_KEY = "your_grok_Api_key"; // Fallback (Get free key from console.groq.com)
-
 // --- AI Interaction Logic ---
 
 // Handle Smart AI Input
@@ -364,8 +360,8 @@ async function handleSmartInput() {
         return;
     }
 
-    if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" && GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-        alert("Please add at least one AI API Key in app.js (Gemini or Groq)!");
+    if (!import.meta.env.VITE_GEMINI_API_KEY && !import.meta.env.VITE_GROQ_API_KEY) {
+        alert("Please ensure your AI API keys are set in the .env file!");
         return;
     }
 
@@ -414,7 +410,7 @@ async function callGroqAI(taskString) {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${GROQ_API_KEY}`
+            "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
         },
         body: JSON.stringify({
             model: "llama-3.1-8b-instant", 
@@ -438,7 +434,7 @@ async function callGroqAI(taskString) {
 }
 
 async function callGeminiAI(taskString) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
 
     const promptText = `
     You are an expert productivity assistant. A user has given you a task/project: "${taskString}".
